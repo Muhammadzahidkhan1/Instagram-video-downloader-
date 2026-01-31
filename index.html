@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Downloader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold text-center mb-6 text-pink-600">Insta Downloader</h1>
+        
+        <div class="space-y-4">
+            <input type="text" id="urlInput" placeholder="Paste Instagram Link here..." 
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+            
+            <button onclick="downloadVideo()" id="btn"
+                    class="w-full bg-pink-600 text-white font-bold py-3 rounded-lg hover:bg-pink-700 transition">
+                Fetch Video
+            </button>
+        </div>
+
+        <div id="result" class="mt-8 hidden">
+            <img id="thumb" src="" class="w-full rounded-lg mb-4 shadow-sm" alt="Thumbnail">
+            <a id="downloadBtn" href="" target="_blank" 
+               class="block text-center bg-green-500 text-white py-2 rounded-lg font-medium hover:bg-green-600">
+                Download MP4
+            </a>
+        </div>
+
+        <p id="status" class="text-center mt-4 text-gray-600 hidden italic">Fetching data, please wait...</p>
+    </div>
+
+    <script>
+        async function downloadVideo() {
+            const url = document.getElementById('urlInput').value;
+            const btn = document.getElementById('btn');
+            const resultDiv = document.getElementById('result');
+            const status = document.getElementById('status');
+
+            if(!url) return alert("Please paste a URL");
+
+            // UI Reset
+            btn.disabled = true;
+            status.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
+
+            try {
+                // PHP API call
+                const response = await fetch(`api.php?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+
+                if(data.status === 'success') {
+                    document.getElementById('thumb').src = data.thumbnail;
+                    document.getElementById('downloadBtn').href = data.video;
+                    resultDiv.classList.remove('hidden');
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (err) {
+                alert("Something went wrong!");
+            } finally {
+                btn.disabled = false;
+                status.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
